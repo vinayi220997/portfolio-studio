@@ -1,0 +1,84 @@
+# MASTER PROMPT: COMPLETE PORTFOLIO WEBSITE & SECURE ADMIN DASHBOARD
+
+## 1. Project Overview & Design Reference
+* **Public Website Reference:** Inspired by and styled after [Nuance Portfolio (Framer)](https://nuance-portfolio.framer.website/).
+* **Core Goal:** Build a fully responsive, modern portfolio website paired with a comprehensive, secure admin dashboard featuring granular content management, multi-profile support, data backup/restore, email integration, and dynamic theme controls.
+* **General Quality Standards:** 
+  * Ensure full responsiveness across desktop, tablet, and mobile devices.
+  * Implement modern, smooth animations across every section where feasible to elevate user experience without compromising performance.
+  * Ensure all changes and settings persist seamlessly after page refreshes.
+
+---
+
+## 2. Version Control & File Management
+* **Version Isolation:** Save every website update as a separate, isolated version (`v1`, `v2`, `v3`, etc.). Never overwrite or delete existing versions.
+* **Prompt Preservation:** Save each evolution's prompt text in a dedicated text file corresponding to its version (`prompt_v1.txt`, `prompt_v2.txt`, etc.).
+* **Incremental Updates:** Each new version must encapsulate only the new changes while fully preserving previous functional baselines.
+
+---
+
+## 3. Admin Authentication & Recovery Security
+* **Initial Login & Credentials Display:** 
+  * Display default admin login credentials **only** during the very first login, hiding them permanently on all subsequent visits.
+  * Always display the following hints on the login interface: `role_context` and `role_context@length`.
+* **Password Expiry & Default Use:** 
+  * The default admin password remains valid for login until it is actively changed or reset via security rules.
+* **Recovery & Verification Flow:**
+  * Prior to allowing access to the "Queue recovery request" flow, require the user to input an admin verification code using the `#code` prompt interface.
+  * **Generic Prompting:** Never expose the actual admin verification code in page text, tooltips, or error strings (display a generic message like: *"Enter the verification code"* instead).
+  * **Recovery Rules:**
+    * Entering the default admin code permits a one-time login using the default password.
+    * Entering a correct recovery code (excluding the default code) permits progression to the queue recovery request flow.
+    * Entering an incorrect code blocks progression and displays a clear error message.
+
+---
+
+## 4. Email Service Integration & Management
+* **Configuration:** Enable configuration via the administrator's Google account App Password.
+* **Direct Operations:** Support direct replies to incoming contact/inquiry emails natively from within the website's admin interface, routing them out through the configured Google account.
+* **Security & Validation:** 
+  * Store email credentials securely on the server side; **never** expose Google App Passwords in client-side code or front-end repositories.
+  * Provide robust authentication checks, connection validation, and explicit error messaging for delivery failures.
+
+---
+
+## 5. Admin Dashboard & Layout Enhancements
+* **Sidebar Layout & Fixes:**
+  * Keep the Sign-out section permanently anchored at the bottom of the sidebar.
+  * Make the navigation area independently scrollable to prevent any overlap issues when active notification cards (e.g., *"The default password is still in use..."*) appear.
+* **Theme & Appearance Customization:**
+  * Support multiple theme modes: **Light**, **Dark**, **System**, and **Browser-supported** themes.
+  * Allow customization of custom solid colors, dynamic gradient backgrounds, and accent colors.
+* **Data Backup, Restore & Export:**
+  * **Backup/Restore:** Allow downloading profile settings/website data as a secure backup file (excluding sensitive authentication secrets/passwords) and restoring via file upload with pre-validation and confirmation prompts.
+  * **Contact Export:** Enable exporting all email/contact data (or emails exclusively) in CSV and JSON formats.
+
+---
+
+## 6. Content Management & Profile Architecture
+* **Multiple Admin Profiles:**
+  * Support adding, editing, duplicating, hiding, publishing, and deleting distinct profiles.
+  * Allow multiple email addresses and phone numbers per profile, with options to designate primary contact points.
+  * Enforce publication constraints: **only one profile can be published at a time**, with automatic replacement upon publishing a new profile (following confirmation).
+* **Repeatable Sections & Duplication:**
+  * Provide a **Duplicate Card** feature across all repeatable sections to copy entries into a new draft record (unpublished by default, with unique IDs).
+* **Resume Management:**
+  * Support file uploads alongside external URL linking for resumes.
+  * Expose dedicated website action buttons for downloading files or opening links in new tabs, paired with a preview option.
+
+---
+
+## 7. Public Website UI, Media, & Branding
+* **Profile Image Management & Editor:**
+  * Admin dashboard image utility supporting aspect ratio cropping, rotation, positioning (up/down/sideways), and horizontal/vertical flipping with live previews (supporting JPG, PNG, WebP).
+* **Modern Profile Image Display:**
+  * Prevent image distortion or strict rigid framing.
+  * Implement modern layouts (frameless styles, overlapping sections, layered designs with subtle shadows/gradients) that blend smoothly into the responsive background.
+* **Interactive Elements & Copy Utilities:**
+  * Add interactive **Copy** buttons next to all public email addresses and phone numbers.
+  * Display visual feedback states upon copying (e.g., checkmark icon with *"Email Copied!"* / *"Phone Number Copied!"* messages) that auto-revert after a short delay.
+* **Dynamic Title Animation:**
+  * Support multiple professional titles separated by commas in the profile section.
+  * Include a toggle to enable/disable typing animations (letter-by-letter typing with blinking cursor, short pause, and erasing loop) or static side-by-side display separated by clean dividers, respecting user reduced-motion accessibility preferences.
+* **Website Icon / Logo Letters:**
+  * Allow custom text-based logo letters or icon configurations to be edited directly from the profile settings with live previews and favicon support.

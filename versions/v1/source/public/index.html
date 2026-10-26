@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ramathota Vinay — UI/UX Designer</title>
+  <meta name="description" content="Portfolio of Ramathota Vinay, UI/UX and visual designer.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" id="favicon">
+  <script src="/shared/theme-boot.js"></script>
+  <link rel="preload" href="/fonts/bricolage.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/shared/tokens.css">
+  <link rel="stylesheet" href="/site.css">
+  <script type="module" src="/site.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="bg" aria-hidden="true"></div>
+
+  <header class="top" id="top">
+    <a class="brand" href="#main" aria-label="Back to top">
+      <span class="mark" data-shape="rounded" aria-hidden="true"></span>
+      <span class="brand-name"></span>
+    </a>
+    <nav class="nav" aria-label="Sections"><ul></ul></nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="mode-btn" type="button" aria-label="Change colour theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg>
+      </button>
+      <a class="btn btn-solid btn-sm" href="#contact">Contact</a>
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </header>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Sections" hidden><ul></ul></nav>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-name">
+      <div class="hero-copy">
+        <div class="sel" data-sel>
+          <span class="sel-label" aria-hidden="true"></span>
+          <h1 id="hero-name" class="hero-name"><span class="sk sk-title"></span></h1>
+          <span class="h tl"></span><span class="h tr"></span><span class="h bl"></span><span class="h br"></span>
+          <span class="h tm"></span><span class="h bm"></span><span class="h ml"></span><span class="h mr"></span>
+          <span class="sel-size" aria-hidden="true"></span>
+        </div>
+        <p class="titles" aria-live="off"></p>
+        <p class="intro"></p>
+        <div class="hero-actions"></div>
+      </div>
+      <figure class="hero-figure">
+        <div class="avatar-wrap"></div>
+        <figcaption class="now-card" hidden></figcaption>
+      </figure>
+    </section>
+    <div id="sections"></div>
+    <div class="empty-state" hidden>
+      <h1>This portfolio isn't published yet.</h1>
+      <p>Check back soon.</p>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <p class="foot-copy"></p>
+    <a href="#main" class="foot-top">Back to top</a>
+  </footer>
+
+  <dialog class="modal" id="resume-dialog" aria-labelledby="resume-title">
+    <div class="modal-head">
+      <h2 id="resume-title">Resume</h2>
+      <div class="modal-actions"></div>
+      <button class="icon-btn" type="button" data-close aria-label="Close preview">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <iframe title="Resume preview" class="modal-frame"></iframe>
+  </dialog>
+
+  <div class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

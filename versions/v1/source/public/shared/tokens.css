@@ -1,0 +1,73 @@
+/* Design tokens shared by the public site and the admin.
+   Themes: light, dark, browser (native system colours). "system" resolves to
+   light or dark in JS before first paint (see /shared/theme-boot.js). */
+@font-face { font-family: 'Bricolage Grotesque'; src: url('/fonts/bricolage.woff2') format('woff2'); font-weight: 200 800; font-stretch: 75% 100%; font-display: swap; }
+@font-face { font-family: 'Hanken Grotesk'; src: url('/fonts/hanken.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Hanken Grotesk'; src: url('/fonts/hanken-italic.woff2') format('woff2'); font-weight: 100 900; font-style: italic; font-display: swap; }
+:root {
+  --accent: #0D7EF2;
+  --on-accent: #FFFFFF;
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --accent-line: color-mix(in srgb, var(--accent) 55%, transparent);
+
+  --canvas: #EEF0F3;
+  --paper: #FFFFFF;
+  --paper-2: #F6F7F9;
+  --ink: #16181D;
+  --ink-2: #3A3F4A;
+  --muted: #5A6170;
+  --line: #D9DDE3;
+  --line-strong: #B9C0CB;
+  --dot: #C9CED7;
+  --good: #137A3F;
+  --warn: #8A5A00;
+  --bad: #B3261E;
+  --shadow: 0 1px 2px rgb(22 24 29 / 6%), 0 8px 24px -12px rgb(22 24 29 / 18%);
+  --shadow-lift: 0 2px 4px rgb(22 24 29 / 6%), 0 18px 40px -18px rgb(22 24 29 / 30%);
+
+  --font-display: 'Bricolage Grotesque', 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --canvas: #1B1C20;
+  --paper: #25272C;
+  --paper-2: #2D3036;
+  --ink: #EDEEF1;
+  --ink-2: #CDD1D8;
+  --muted: #A3A9B4;
+  --line: #3A3D44;
+  --line-strong: #555A63;
+  --dot: #34373E;
+  --good: #5BD08C;
+  --warn: #F2C063;
+  --bad: #FF8A80;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px -12px rgb(0 0 0 / 60%);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 30%), 0 18px 40px -18px rgb(0 0 0 / 70%);
+  color-scheme: dark;
+}
+
+/* "Browser" theme: the browser's own native colours (CSS system colours),
+   which follow the OS/browser preference and high-contrast modes. */
+:root[data-theme='browser'] {
+  color-scheme: light dark;
+  --canvas: Canvas;
+  --paper: Canvas;
+  --paper-2: color-mix(in srgb, CanvasText 5%, Canvas);
+  --ink: CanvasText;
+  --ink-2: CanvasText;
+  --muted: color-mix(in srgb, CanvasText 68%, Canvas);
+  --line: color-mix(in srgb, CanvasText 18%, Canvas);
+  --line-strong: color-mix(in srgb, CanvasText 35%, Canvas);
+  --dot: color-mix(in srgb, CanvasText 14%, Canvas);
+  --accent: LinkText;
+  --on-accent: Canvas;
+  --shadow: none;
+  --shadow-lift: 0 0 0 1px var(--line-strong);
+}

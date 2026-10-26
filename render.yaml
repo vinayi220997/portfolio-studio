@@ -1,0 +1,37 @@
+# Render Blueprint — one web service. The database is Neon Postgres (free),
+# connected through DATABASE_URL. Values marked sync: false are entered in the
+# Render dashboard when you apply the Blueprint; they never live in Git.
+services:
+  - type: web
+    name: portfolio-studio
+    runtime: node
+    region: singapore
+    plan: free           # change to "starter" if you want Gmail sending (free plan blocks mail ports)
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        sync: false
+      - key: DATA_ENCRYPTION_KEY
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_BOOTSTRAP_ID
+        sync: false
+      - key: ADMIN_BOOTSTRAP_PASSWORD
+        sync: false
+      - key: ADMIN_DEFAULT_CODE
+        sync: false
+      - key: ADMIN_RECOVERY_CODE
+        sync: false
+      - key: ADMIN_HINT_ID
+        value: role_context
+      - key: ADMIN_HINT_PASSWORD
+        value: role_context@length
