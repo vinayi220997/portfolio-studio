@@ -9,6 +9,7 @@ process.env.ADMIN_BOOTSTRAP_PASSWORD = 'Default-pass-58';
 process.env.ADMIN_DEFAULT_CODE = 'DEFAULT-CODE-1';
 process.env.ADMIN_RECOVERY_CODE = 'RECOVERY-CODE-2';
 process.env.DATA_ENCRYPTION_KEY = 'x'.repeat(40);
+process.env.PUBLIC_SITE_ORIGINS = 'https://vinayi220997.github.io';
 
 const { createApp } = await import('../server/index.js');
 
@@ -299,6 +300,23 @@ test('security headers are present and errors are generic', async () => {
   assert.equal(r.headers.get('x-powered-by'), null);
   const bad = await fetch(base + '/api/auth/login', { method: 'POST', headers: H, body: '{broken' });
   assert.equal(bad.status, 400);
+});
+
+test('GitHub page origin may read public content, never admin or auth', async () => {
+  const gh = { Origin: 'https://vinayi220997.github.io' };
+  const site = await fetch(base + '/api/public/site', { headers: gh });
+  assert.equal(site.headers.get('access-control-allow-origin'), 'https://vinayi220997.github.io');
+  assert.equal(site.headers.get('access-control-allow-credentials'), null);
+  const pre = await fetch(base + '/api/public/contact', { method: 'OPTIONS', headers: { ...gh, 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type' } });
+  assert.equal(pre.status, 204);
+  const other = await fetch(base + '/api/public/site', { headers: { Origin: 'https://evil.example' } });
+  assert.equal(other.headers.get('access-control-allow-origin'), null);
+  for (const p of ['/api/admin/profiles', '/api/auth/login-info', '/api/auth/me']) {
+    const r = await fetch(base + p, { headers: gh });
+    assert.equal(r.headers.get('access-control-allow-origin'), null, p);
+  }
+  const fav = await fetch(base + '/favicon.svg', { headers: gh });
+  assert.equal(fav.headers.get('cross-origin-resource-policy'), 'cross-origin');
 });
 
 test('logout ends the session', async () => {

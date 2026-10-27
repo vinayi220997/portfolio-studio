@@ -43,6 +43,9 @@ export const config = {
   encryptionKey: env.DATA_ENCRYPTION_KEY || '',
   sessionSecret: env.SESSION_SECRET || env.DATA_ENCRYPTION_KEY || '',
 
+  // Other sites allowed to read published content (the GitHub Pages copy).
+  publicSiteOrigins: (env.PUBLIC_SITE_ORIGINS || '').split(',').map((o) => o.trim().replace(/\/$/, '')).filter((o) => /^https?:\/\/[^/]+$/.test(o)),
+
   sessionHours: Number(env.SESSION_HOURS || 12),
   maxUploadMb: Number(env.MAX_UPLOAD_MB || 8),
 };

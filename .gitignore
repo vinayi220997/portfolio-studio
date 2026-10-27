@@ -10,3 +10,4 @@ coverage/
 backups/
 *.pem
 *.key
+dist-pages/

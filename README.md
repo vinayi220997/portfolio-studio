@@ -23,7 +23,8 @@ Tests:
 
 ```bash
 npm test                              # 20 API tests on an in-memory database
-python3 test/browser/e2e.py           # 28 browser checks (needs: pip install playwright && playwright install chromium; server running on :3000 with a fresh .data/)
+python3 test/browser/e2e.py           # 28 browser checks
+python3 test/browser/pages.py         # GitHub page checks (setup notes at the top of the file) (needs: pip install playwright && playwright install chromium; server running on :3000 with a fresh .data/)
 ```
 
 ## Deploy (GitHub → Render → Neon)
@@ -44,6 +45,24 @@ python3 test/browser/e2e.py           # 28 browser checks (needs: pip install pl
 Every push to `main` redeploys. Content edits in the admin never need a redeploy.
 
 **Free-plan limits.** The service sleeps after ~15 minutes idle; the first visit after that takes 30–60 seconds. Render's free plan also **blocks outgoing e-mail ports**, so Gmail sending (replies, notifications, reset links) needs the service on a paid instance (Starter). Contact-form messages are still saved to the inbox on the free plan.
+
+## GitHub page (public copy that updates itself)
+
+The public site also runs on GitHub Pages at `https://vinayi220997.github.io/portfolio-studio-site/`.
+
+- On every visit it loads published content from the Render service, so **admin edits show up there automatically**. No rebuild or push needed.
+- If Render is asleep, a bundled snapshot appears after ~4.5 seconds, then it switches to live content when Render wakes (up to 90 seconds).
+- The contact form sends messages to the admin inbox on Render.
+- Only public read routes and the contact form accept requests from `PUBLIC_SITE_ORIGINS` (set in `render.yaml`). Admin and sign-in routes never do, and no cookies are sent cross-origin.
+
+Rebuild only after code or design changes:
+
+```bash
+LIVE_API_URL=https://<your-service>.onrender.com npm run build:pages
+# then push the contents of dist-pages/ to the public portfolio-studio-site repo
+```
+
+First-time setup: create a public, empty repo `portfolio-studio-site`, push `dist-pages/` to its `main` branch, then in that repo open **Settings → Pages → Build and deployment**, pick **Deploy from a branch**, branch `main`, folder `/ (root)`, and save.
 
 ## E-mail (Gmail App Password)
 

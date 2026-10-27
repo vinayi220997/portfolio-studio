@@ -1,6 +1,19 @@
 import { applyTheme, watchSystem } from '/shared/theme.js';
 
 const $ = (s, el = document) => el.querySelector(s);
+
+// Same code runs on Render (same-origin API) and on GitHub Pages, where
+// config.js sets the Render address, a bundled snapshot and the base path.
+const CFG = window.PORTFOLIO_CONFIG || {};
+const API = String(CFG.api || '').replace(/\/$/, '');
+const BASE = CFG.base || '/';
+const apiUrl = (p) => API + p;
+const assetUrl = (p) => {
+  if (!p) return p;
+  if (p.startsWith('/files/') || p.startsWith('/favicon')) return API + p;
+  if (p.startsWith('/')) return BASE + p.slice(1);
+  return p;
+};
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Safe element builder: text is always set with textContent (no HTML injection).
@@ -64,27 +77,55 @@ function setupModeButton() {
 }
 
 // ---------- render ----------
-async function load() {
-  const res = await fetch('/api/public/site', { headers: { Accept: 'application/json' } });
-  if (!res.ok) throw new Error('Site data unavailable');
-  site = await res.json();
-  applyTheme(site.theme, { overrideMode: visitorMode() });
-  watchSystem(() => site.theme, visitorMode);
-  setupModeButton();
-  if (!site.profile) {
-    $('.hero').hidden = true;
-    $('.empty-state').hidden = false;
-    return;
+async function getJson(url, ms) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: ctl.signal });
+    if (!res.ok) throw new Error('Site data unavailable');
+    return await res.json();
+  } finally {
+    clearTimeout(t);
   }
-  render(site.profile);
 }
 
-function render(p) {
+let started = false;
+function show(data, live) {
+  site = data;
+  applyTheme(site.theme, { overrideMode: visitorMode() });
+  if (!started) {
+    started = true;
+    watchSystem(() => site.theme, visitorMode);
+    setupModeButton();
+  }
+  const empty = !site.profile;
+  $('.hero').hidden = empty;
+  $('.empty-state').hidden = !empty;
+  if (!empty) render(site.profile, live);
+}
+
+async function load() {
+  if (!CFG.snapshot) return show(await getJson(apiUrl('/api/public/site'), 30000), true);
+  // GitHub Pages: ask the live server first. A sleeping free Render service can
+  // take up to a minute to wake, so after a short wait show the bundled
+  // snapshot, then swap in live content as soon as it arrives.
+  const live = getJson(apiUrl('/api/public/site'), 90000).then((d) => ({ d }), () => null);
+  const first = await Promise.race([live, new Promise((r) => setTimeout(() => r('slow'), CFG.waitMs || 4500))]);
+  if (first && first !== 'slow') return show(first.d, true);
+  let snap = null;
+  try { snap = await getJson(CFG.snapshot, 10000); show(snap, false); } catch { /* no snapshot */ }
+  const late = await live;
+  if (late) {
+    if (!snap || JSON.stringify(late.d) !== JSON.stringify(snap)) show(late.d, true);
+  } else if (!snap) throw new Error('Site data unavailable');
+}
+
+function render(p, live = true) {
   document.title = `${p.displayName}${firstTitle(p) ? ' — ' + firstTitle(p) : ''}`;
   const desc = document.querySelector('meta[name=description]');
   if (desc && p.intro) desc.setAttribute('content', p.intro);
   // Bust the favicon cache so logo/colour edits show straight away.
-  $('#favicon').href = '/favicon.svg?v=' + Date.now();
+  if (live) $('#favicon').href = assetUrl('/favicon.svg') + '?v=' + Date.now();
 
   const mark = $('.mark');
   mark.textContent = p.logo.letters;
@@ -175,7 +216,7 @@ function renderHero(p) {
   // Avatar
   const wrap = $('.avatar-wrap');
   wrap.dataset.style = p.avatar.style;
-  const src = p.avatar.fileId ? `/files/${p.avatar.fileId}` : p.avatar.src;
+  const src = assetUrl(p.avatar.fileId ? `/files/${p.avatar.fileId}` : p.avatar.src);
   wrap.replaceChildren(
     src
       ? h('img', { src, alt: p.avatar.alt || p.displayName, width: 482, height: 1253, decoding: 'async', fetchpriority: 'high' })
@@ -239,7 +280,7 @@ function renderTitles(p) {
 }
 
 function resumeActions(r) {
-  const href = r.mode === 'file' ? (r.fileId ? `/files/${r.fileId}` : '') : r.url;
+  const href = r.mode === 'file' ? (r.fileId ? assetUrl(`/files/${r.fileId}`) : '') : r.url;
   if (!href) return null;
   const group = h('div', { class: 'resume-group', role: 'group', 'aria-label': r.label });
   if (r.showDownload) {
@@ -274,7 +315,7 @@ const SECTION = {
     if (!p.projects.length) return null;
     const sec = sectionShell(s, `${p.projects.length} ${p.projects.length === 1 ? 'project' : 'projects'}`);
     sec.append(h('div', { class: 'work-grid' }, p.projects.map((pr) => {
-      const img = pr.imageFileId ? `/files/${pr.imageFileId}` : pr.imageUrl;
+      const img = pr.imageFileId ? assetUrl(`/files/${pr.imageFileId}`) : pr.imageUrl;
       const initials = pr.title.split(/\s+/).filter((w) => /[A-Za-z0-9]/.test(w)).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
       return h('article', { class: 'project reveal' },
         h('span', { class: 'frame-label', 'aria-hidden': 'true', text: pr.title }),
@@ -419,7 +460,7 @@ function contactForm() {
     submit.disabled = true;
     submit.textContent = 'Sending…';
     try {
-      const res = await fetch('/api/public/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await fetch(apiUrl('/api/public/contact'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const out = await res.json().catch(() => ({}));
       if (res.ok) {
         form.reset();

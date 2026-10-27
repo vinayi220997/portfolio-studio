@@ -54,10 +54,13 @@ export async function createApp({ memoryDb = false } = {}) {
 
   app.use('/api/auth', authRouter);
   app.use('/api/admin', adminRouter);
-  app.use('/api/public', publicRouter);
+  // The GitHub Pages copy of the site reads published content from here.
+  // Only these public routes allow cross-origin use; admin and auth never do,
+  // and no cookies are accepted cross-origin.
+  app.use('/api/public', publicCors, publicRouter);
 
   // Uploaded files (profile images, resume PDFs). IDs are random and unguessable.
-  app.get('/files/:id', async (req, res, next) => {
+  app.get('/files/:id', publicCors, async (req, res, next) => {
     try {
       if (!/^f_[A-Za-z0-9_-]{6,40}$/.test(req.params.id)) return res.status(404).end();
       const { rows } = await db().query('SELECT name, mime, bytes FROM files WHERE id = $1', [req.params.id]);
@@ -69,7 +72,11 @@ export async function createApp({ memoryDb = false } = {}) {
         'Content-Disposition': `${disposition}; filename="${f.name.replace(/"/g, '')}"`,
         'Cache-Control': 'public, max-age=31536000, immutable',
         'X-Content-Type-Options': 'nosniff',
+        'Cross-Origin-Resource-Policy': 'cross-origin',
+        // Lets the GitHub page preview the resume PDF in its dialog.
+        'Content-Security-Policy': `frame-ancestors 'self' ${config.publicSiteOrigins.join(' ')}`.trim(),
       });
+      res.removeHeader('X-Frame-Options');
       res.send(Buffer.from(f.bytes));
     } catch (e) {
       next(e);
@@ -77,7 +84,7 @@ export async function createApp({ memoryDb = false } = {}) {
   });
 
   // Favicon generated from the logo letters and accent colour.
-  app.get('/favicon.svg', async (req, res, next) => {
+  app.get('/favicon.svg', publicCors, async (req, res, next) => {
     try {
       const p = await publishedProfile();
       const theme = validateTheme(await kvGet('theme', DEFAULT_THEME));
@@ -85,7 +92,7 @@ export async function createApp({ memoryDb = false } = {}) {
       const shape = p?.data?.logo?.shape || 'rounded';
       const rx = shape === 'circle' ? 32 : shape === 'square' ? 4 : 14;
       const size = letters.length > 2 ? 24 : letters.length > 1 ? 30 : 38;
-      res.type('image/svg+xml').set('Cache-Control', 'no-cache').send(
+      res.type('image/svg+xml').set({ 'Cache-Control': 'no-cache', 'Cross-Origin-Resource-Policy': 'cross-origin' }).send(
         `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="${rx}" fill="${theme.accent}"/><text x="32" y="33" dominant-baseline="middle" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="${size}" fill="#fff">${letters}</text></svg>`
       );
     } catch (e) {
@@ -111,6 +118,25 @@ export async function createApp({ memoryDb = false } = {}) {
   });
 
   return app;
+}
+
+// CORS for the read-only public routes and the contact form, limited to the
+// origins listed in PUBLIC_SITE_ORIGINS (e.g. https://vinayi220997.github.io).
+function publicCors(req, res, next) {
+  const origin = req.get('Origin');
+  if (origin && config.publicSiteOrigins.includes(origin)) {
+    res.set({
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Methods': 'GET, POST',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '600',
+    });
+    res.append('Vary', 'Origin');
+    if (req.method === 'OPTIONS') return res.status(204).end();
+  } else if (req.method === 'OPTIONS') {
+    return res.status(403).end();
+  }
+  next();
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(ROOT, 'server/index.js');

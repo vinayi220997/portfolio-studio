@@ -31,6 +31,8 @@ services:
         sync: false
       - key: ADMIN_RECOVERY_CODE
         sync: false
+      - key: PUBLIC_SITE_ORIGINS
+        value: https://vinayi220997.github.io
       - key: ADMIN_HINT_ID
         value: role_context
       - key: ADMIN_HINT_PASSWORD
