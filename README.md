@@ -5,6 +5,15 @@ Vinay Ramathota's UI/UX portfolio website with a private admin dashboard.
 - **Public site** (`/`): hero with a seated profile image, typed job titles, work, about, experience, skills, education, certifications and a contact form. Light, dark, match-device and browser-colour themes. Copy buttons for e-mail and phone. Resume download / open / preview.
 - **Admin** (`/admin/`): multiple profiles (one live at a time), every section editable, duplicate cards as drafts, image editor, theme editor, contact inbox with Gmail replies, backup / restore, contact export, password recovery codes, activity log.
 
+## Live links
+
+| | Address |
+|---|---|
+| Portfolio (GitHub page) | https://vinayi220997.github.io/portfolio-studio-site/ |
+| Portfolio (Render) | https://portfolio-studio-diuq.onrender.com/ |
+| Admin dashboard | https://portfolio-studio-diuq.onrender.com/admin/ |
+| GitHub page source | https://github.com/vinayi220997/portfolio-studio-site |
+
 Stack: Node 22 + Express, PostgreSQL (Neon in production, PGlite locally), no front-end build step.
 
 ---

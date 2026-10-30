@@ -97,7 +97,7 @@ fs.writeFileSync(path.join(OUT, 'favicon.svg'), snap.favicon);
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 fs.writeFileSync(
   path.join(OUT, 'README.md'),
-  `# Vinay Ramathota — portfolio (GitHub Pages copy)\n\nBuilt from the private \`portfolio-studio\` repo with \`npm run build:pages\`. Don't edit these files by hand.\n\n- Content loads live from ${LIVE} on every visit, so edits in the admin appear here automatically.\n- \`snapshot.json\` (taken ${new Date().toISOString()}) is shown only while the live server is waking up or unreachable.\n- The contact form sends messages to the admin inbox on the live server.\n`
+  `# Vinay Ramathota — portfolio (GitHub Pages copy)\n\n## Live links\n\n- Portfolio: https://vinayi220997.github.io${BASE}\n- Same site on Render: ${LIVE}/\n- Source code: https://github.com/vinayi220997/portfolio-studio\n\nBuilt from the \`portfolio-studio\` repo with \`npm run build:pages\`. Don't edit these files by hand.\n\n- Content loads live from ${LIVE} on every visit, so edits in the admin appear here automatically.\n- \`snapshot.json\` (taken ${new Date().toISOString()}) is shown only while the live server is waking up or unreachable.\n- The contact form sends messages to the admin inbox on the live server.\n`
 );
 
 const count = (dir) => fs.readdirSync(dir, { withFileTypes: true }).reduce((n, d) => n + (d.isDirectory() ? count(path.join(dir, d.name)) : 1), 0);
